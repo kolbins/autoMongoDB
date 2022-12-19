@@ -1,33 +1,16 @@
 #!/bin/bash
 
-# Устанавливаем необходимые зависимости
-sudo apt-get install libcurl4 openssl liblzma5
+# Ключ
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
+sudo apt-get install gnupg
+wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | sudo apt-key add -
 
-# Скачиваем файл
-curl -O https://fastdl.mongodb.org/linux/mongodb-linux-x86_64-ubuntu1804-5.0.9.tgz
+# Репозиторий
+echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu bionic/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
+sudo apt-get update
 
-# Разархивируем
-tar -zxvf mongodb-linux-x86_64-ubuntu1804-5.0.9.tgz
-
-# Копируем файлы
-sudo cp mongodb-linux-x86_64-ubuntu1804-5.0.9/bin/* /usr/local/bin/
-
-# Создаем нужные директории
-sudo mkdir -p /var/lib/mongo
-sudo mkdir -p /var/log/mongodb
-
-# Выдаем нужные права
-sudo chown `whoami` /var/lib/mongo     # Or substitute another user
-sudo chown `whoami` /var/log/mongodb   # Or substitute another user
-
-# Запускаем
-mongod --dbpath /var/lib/mongo --logpath /var/log/mongodb/mongod.log --fork
-
-# Устанавливаем tools
-curl -O https://fastdl.mongodb.org/tools/db/mongodb-database-tools-ubuntu1804-x86_64-100.5.3.tgz
-
-# Разархивируем
-tar -zxvf mongodb-database-tools-ubuntu1804-x86_64-100.5.3.tgz
-
-# Копируем
-sudo cp mongodb-database-tools-ubuntu1804-x86_64-100.5.3/bin/* /usr/local/bin/
+# Установка
+sudo apt-get install -y mongodb-org
+systemctl restart mongod
+systemctl enable mongod
+systemctl status mongod
